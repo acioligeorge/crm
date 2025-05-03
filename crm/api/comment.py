@@ -1,9 +1,30 @@
 from collections.abc import Iterable
+import os
+import requests
 
 import frappe
 from frappe import _
 from bs4 import BeautifulSoup
 from crm.fcrm.doctype.crm_notification.crm_notification import notify_user
+
+
+def upload_to_vercel_blob(file_name: str, content: bytes) -> str:
+    """
+    Uploads file content to Vercel Blob storage and returns the public URL.
+    """
+    token = os.getenv("BLOB_READ_WRITE_TOKEN")
+    if not token:
+        raise Exception("BLOB_READ_WRITE_TOKEN is not set in environment variables")
+
+    url = f"https://blob.vercel-storage.com/{file_name}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/octet-stream",
+    }
+    response = requests.put(url, headers=headers, data=content)
+    if response.status_code != 200:
+        raise Exception(f"Failed to upload to Vercel Blob: {response.text}")
+    return url
 
 
 def on_update(self, method):
@@ -83,9 +104,13 @@ def add_attachments(name: str, attachments: Iterable[str | dict]) -> None:
             }
         elif isinstance(a, dict) and "fcontent" in a and "fname" in a:
             # dict returned by frappe.attach_print()
+            file_name = a["fname"]
+            file_content = a["fcontent"]
+            # Upload to Vercel Blob storage
+            blob_url = upload_to_vercel_blob(file_name, file_content.encode() if isinstance(file_content, str) else file_content)
             file_args = {
-                "file_name": a["fname"],
-                "content": a["fcontent"],
+                "file_name": file_name,
+                "file_url": blob_url,
                 "is_private": 1,
             }
         else:
