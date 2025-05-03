@@ -185,10 +185,9 @@ You need Docker, docker-compose and git setup on your machine. Refer [Docker doc
 <br>
 <br>
 <div align="center" style="padding-top: 0.75rem;">
-	<a href="https://frappe.io" target="_blank">
+	<a href="https://vercel.com/george-s-projects-7b6c06fa/crm-frontend" target="_blank">
 		<picture>
-			<source media="(prefers-color-scheme: dark)" srcset="https://frappe.io/files/Frappe-white.png">
-			<img src="https://frappe.io/files/Frappe-black.png" alt="Frappe Technologies" height="28"/>
+			<img src="https://vercel.com/button" alt="Deploy with Vercel" height="28" />
 		</picture>
 	</a>
 </div>
